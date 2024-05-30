@@ -114,13 +114,17 @@ class SlurmExecutableBuilder:
         #     file.write(script)
         
         # Execute file
+        try:
+            output = subprocess.check_output(["sbatch", self.script_file], stderr=subprocess.STDOUT)
+        except Exception as e:
+            raise RuntimeError(f"Failed to execute slurm task: {e}")
+
         print()
         print("*===============================================================================*")
         print(f"|   Executing Slurm job with name \"{self.job_name}\"...")
         if self.full_job_name is not None:
             print(f"|      ({self.full_job_name})")
         print("|")
-        output = subprocess.check_output(["sbatch", self.script_file], stderr=subprocess.STDOUT)
         output = output.decode().strip() # parse binary; strip newlines
         
         if output.startswith("Submitted batch job"):
