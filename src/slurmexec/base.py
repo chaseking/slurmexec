@@ -19,14 +19,19 @@ def set_slurm_debug(debug: bool = True):
     _IS_SLURM_DEBUG = debug
 
     if debug:
+        print()
         print("=======================================================")
         print("|   NOTICE - Slurm running in debug mode.")
         print("|   All slurm tasks will be immediately executed")
         print("|   rather than queued on Slurm.")
         print("=======================================================")
+        print()
 
 def get_slurm_id():
-    return get_env_var("SLURM_JOB_ID")
+    if _IS_SLURM_DEBUG:
+        return "SLURM_DEBUG"
+    else:
+        return get_env_var("SLURM_JOB_ID")
 
 def is_this_a_slurm_job():
     global _IS_SLURM_DEBUG
@@ -171,7 +176,7 @@ def slurm_exec(func, n_parallel_jobs=1, script_dir=None, job_name=None, slurm_ar
         ValueError: If func is not an @slurm_job
     """
     if not hasattr(func, "_is_slurm_job"):
-        raise ValueError(f"Function {func.__name__} is not decorated with @slurm_job!")
+        raise ValueError(f"Function {func.__name__} must be decorated with @slurm_job")
     
     if slurm_args is None:
         slurm_args = {}

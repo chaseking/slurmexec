@@ -13,7 +13,10 @@ if is_this_a_slurm_job():
 # Any arguments (including their type and default value) are parsed from the
 # command line. Therefore it is good practice to give argument types and
 # defaults, when possible.
+@slurm_job
 def countdown(start: int = 10):
+    print(f"Starting countdown task with slurm ID: {get_slurm_id()}")
+
     ticker = start
     
     while ticker > 0:
@@ -27,7 +30,7 @@ if __name__ == "__main__":
     slurm_exec(
         func = countdown,
         job_name = "my_countdown_task",  # if not supplied the function name is used (here "countdown")
-        slurm_pre_run_commands = [
+        pre_run_commands = [
             "echo 'Put your commands to execute before this python file here'"
             # e.g., "conda activate myenv"...
         ]
