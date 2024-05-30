@@ -1,6 +1,19 @@
 # SlurmExec
 Lightweight Python library to easily deploy and execute Slurm tasks. Fast and easy; no dependencies needed.
 
+## Install
+Option 1 (preferred): Directly:
+```
+pip install git+https://github.com/chaseking/slurmexec.git
+```
+
+Option 2: Clone and install
+```
+git clone git@github.com:chaseking/slurmexec.git
+cd slurmexec
+pip install -e .
+```
+
 ## Example
 ```python
 from slurmexec import *
