@@ -1,7 +1,7 @@
 from slurmexec import *
 
-# This sets debug mode, allowing tasks to be executed locally for testing.
-set_slurm_debug()
+# Uncomment to allow for local execution (i.e., not requiring it be executed on slurm)
+# set_slurm_debug()
 
 if is_this_a_slurm_job():
     # Since this python file is executed on the slurm login node, large imports
