@@ -1,0 +1,18 @@
+[project]
+name = "slurmexec"
+version = "1.0.0"
+description = "Slurm python executor."
+readme = "README.md"
+license = {file = "LICENSE"}
+authors = [
+    {name = "Chase King", email = "iamchaseking@gmail.com"},
+]
+classifiers = [
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+]
+requires-python = ">=3"
+
+[project.urls]
+Source = "https://github.com/chasek/slurmexec"
+Tracker = "https://github.com/chasek/slurmexec/issues"
