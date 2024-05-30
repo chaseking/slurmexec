@@ -33,5 +33,8 @@ if __name__ == "__main__":
         pre_run_commands = [
             "echo 'Put your commands to execute before this python file here'"
             # e.g., "conda activate myenv"...
-        ]
+        ],
+        slurm_args = {
+            "--time": "0-00:01:00",  # default 1 min runtime
+        }
     )

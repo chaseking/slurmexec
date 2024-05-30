@@ -1,6 +1,11 @@
 # SlurmExec
 Lightweight Python library to easily deploy and execute Slurm tasks. Fast and easy; no dependencies needed.
 
+## Features
+- Define a job function in Python and call `slurm_exec` in the python file `__main__`
+- Dynamically-created slurm scripts avoid the headache of writing and manually keeping track of messy slurm job files
+- Control function arguments from command line
+
 ## Install
 Option 1 (preferred): Directly:
 ```
@@ -34,6 +39,9 @@ def hello(message: str = "World"):
 if __name__ == "__main__":
     slurm_exec(
         func = hello,
+        slurm_args = {
+            "--slurm_arg": "value",
+        }
         pre_run_commands = [
             "conda activate myenv"
         ]
