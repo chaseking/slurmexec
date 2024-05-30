@@ -28,5 +28,6 @@ if __name__ == "__main__":
 ```
 
 ```bash
+# Executed on a slurm login node
 python myfile.py --message 'big beautiful world'
 ```
