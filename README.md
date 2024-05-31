@@ -26,6 +26,8 @@ from slurmexec import *
 # set_slurm_debug()  # to run locally
 
 if is_this_a_slurm_job():
+    # Conditional imports to avoid memory
+    # crashing (OOM) Slurm login node
     import biglibrary
 
 @slurm_job
@@ -40,7 +42,7 @@ if __name__ == "__main__":
     slurm_exec(
         func = hello,
         slurm_args = {
-            "--slurm_arg": "value",
+            "--gres": "gpu:1",
         }
         pre_run_commands = [
             "conda activate myenv"
