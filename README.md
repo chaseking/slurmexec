@@ -11,7 +11,7 @@ Option 1 (preferred): Directly:
 ```
 pip install git+https://github.com/chaseking/slurmexec.git
 ```
-**Note:** If you use this method you will need to run `pip install --upgrade git+...` to install updates made to this package. Eventually I will make this available on PyPI.
+**Note:** If you use this method you will need to run `pip install --upgrade git+https://github.com/chaseking/slurmexec.git` to install updates made to this package. Eventually I will make this available on PyPI.
 
 Option 2: Clone and install
 ```

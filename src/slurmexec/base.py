@@ -98,7 +98,7 @@ class SlurmExecutableBuilder:
 # The -l flag makes the script run as if it were executed on the login node;
 # this makes it so ~/.bashrc is loaded and the conda env loads properly.
 #
-# This script was created by a cwkphd.slurm.SlurmExecutableBuilder
+# This script was created by a slurmexec SlurmExecutableBuilder
 #
 {args}
 
