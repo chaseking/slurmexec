@@ -282,5 +282,11 @@ def slurm_exec(func, n_parallel_jobs=1, script_dir=None, job_name=None, slurm_ar
         exec_args_str = " ".join([f"--{a} {v}" for a, v in exec_args.items()])
         slurm.command(f"python {python_file} {exec_args_str}")
 
+        print(exec_args_str)
+        print(parser._actions)
+        print([action.dest
+                       for action in parser._actions
+                       if not action.option_strings])
+
         # Finally execute the sbatch
-        slurm.sbatch()
+        # slurm.sbatch()

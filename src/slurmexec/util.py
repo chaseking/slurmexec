@@ -17,6 +17,17 @@ def get_env_var(*varnames):
     v = tuple(os.environ.get(name) for name in varnames)
     return v[0] if len(varnames) == 1 else v
 
+
+def _str_to_bool(value):
+    if isinstance(value, bool):
+        return value
+    if value.lower() in ('false', 'f', '0', 'no', 'n'):
+        return False
+    elif value.lower() in ('true', 't', '1', 'yes', 'y'):
+        return True
+    raise ValueError(f'{value} is not a valid boolean value')
+
+
 def load_func_argparser(func, ignore=None):
     """
     Instantiates an ArgumentParser with arguments for each argument in func, except those in ignore.
@@ -46,9 +57,14 @@ def load_func_argparser(func, ignore=None):
 
         if dtype == bool:
             # kwargs["action"] = argparse.BooleanOptionalAction
-            kwargs["action"] = "store_true" if default is False else "store_false"
-            del kwargs["type"]  # can't have both type and store_true action
-            kwargs["help"] += f" Use `--{name}` to set to {not default}"
+            # kwargs["action"] = "store_true" if default is False else "store_false"
+            # del kwargs["type"]  # can't have both type and store_true action
+
+            kwargs["type"] = _str_to_bool
+            kwargs["nargs"] = "?"  # so just `--flag` is equivalent to `not default`
+            kwargs["const"] = not default
+            kwargs["default"] = default
+            kwargs["help"] += f" Use `--{name}` to set to {not default}. (Alternatively `--{name} True/False`)"
 
         parser.add_argument(f"--{name}", **kwargs)
     
