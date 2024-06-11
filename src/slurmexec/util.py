@@ -38,6 +38,15 @@ def load_func_argparser(func, ignore=None):
 
         dtype = _get_or_none(param.annotation)
         default = _get_or_none(param.default)
-        parser.add_argument(f"--{name}", type=dtype, default=default, help=(f"(default: {default})" if default is not None else None))
+        kwargs = {
+            "type": dtype,
+            "default": default,
+            "help": f"(default: {default})" if default is not None else None
+        }
+
+        if dtype == bool:
+            kwargs["action"] = argparse.BooleanOptionalAction
+
+        parser.add_argument(f"--{name}", **kwargs)
     
     return parser
