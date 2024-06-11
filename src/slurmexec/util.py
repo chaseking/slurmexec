@@ -41,11 +41,14 @@ def load_func_argparser(func, ignore=None):
         kwargs = {
             "type": dtype,
             "default": default,
-            "help": f"(default: {default})" if default is not None else None
+            "help": f"(Default: {default})" if default is not None else None
         }
 
         if dtype == bool:
-            kwargs["action"] = argparse.BooleanOptionalAction
+            # kwargs["action"] = argparse.BooleanOptionalAction
+            kwargs["action"] = "store_true" if default is False else "store_false"
+            del kwargs["type"]  # can't have both type and store_true action
+            kwargs["help"] += f" Use `--{name}` to set to {not default}"
 
         parser.add_argument(f"--{name}", **kwargs)
     
