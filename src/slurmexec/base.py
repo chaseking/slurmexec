@@ -135,6 +135,7 @@ class SlurmExecutableBuilder:
             print(f"|   Log file: {self._args['--output'].replace('%x', self.job_name).replace('%A', job_id)}")
         else:
             print("|   Status: FAIL [!!!]")
+            print(f"|   Script file: {self.script_file}")
             print(f"|   Error: Bad sbatch output:")
             
             for line in output.split("\n"):
