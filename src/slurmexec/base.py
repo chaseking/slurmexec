@@ -57,7 +57,7 @@ class SlurmExecutableBuilder:
         }
         self._commands = []
 
-        self.output(f"%x_%A.log") # %x is job name, %A is job id assigned by slurm
+        self.output(f"%x_%j.log") # %x is job name, %A is job id assigned by slurm
 
         if full_job_name is None:
             self.command(f"echo '# Executing job \"{job_name}\" in a task generated using SlurmExecutableBuilder.'")
@@ -132,7 +132,7 @@ class SlurmExecutableBuilder:
             print("|   Status: SUCCESS")
             print(f"|   Slurm job id: {job_id}")
             print(f"|   Script file: {self.script_file}")
-            print(f"|   Log file: {self._args['--output'].replace('%x', self.job_name).replace('%A', job_id)}")
+            print(f"|   Log file: {self._args['--output'].replace('%x', self.job_name).replace('%A', job_id).replace('%j', job_id)}")
         else:
             print("|   Status: FAIL [!!!]")
             print(f"|   Script file: {self.script_file}")
@@ -256,7 +256,8 @@ def slurm_exec(func, n_parallel_jobs=1, script_dir=None, job_name=None, slurm_ar
         # %A is the slurm array parent job id
         # %a is the array task id
         # %x is the job name but we're saving that in the folder
-        slurm.output("%A_%j.out" if is_array_task else "%A.out")
+        # %j is the job ID
+        slurm.output("%A_%a.out" if is_array_task else "%j.out")
         
         slurm.command([
             # Print some info about the cluster
