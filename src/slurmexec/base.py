@@ -256,7 +256,7 @@ def slurm_exec(func, n_parallel_jobs=1, script_dir=None, job_name=None, slurm_ar
         # %A is the slurm array parent job id
         # %a is the array task id
         # %x is the job name but we're saving that in the folder
-        slurm.output("%A_%a.out" if is_array_task else "%A.out")
+        slurm.output("%A_%j.out" if is_array_task else "%A.out")
         
         slurm.command([
             # Print some info about the cluster
