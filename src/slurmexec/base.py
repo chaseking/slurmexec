@@ -50,7 +50,7 @@ class SlurmExecutableBuilder:
         else:
             self._dir = script_dir
         
-        self.script_file = self._dir / f"_slurm_script.sh"
+        self.script_file = self._dir / f"job.slurm"
         
         self._args = {
             "--job-name": job_name,
