@@ -52,7 +52,7 @@ def load_func_argparser(func, ignore=None):
         kwargs = {
             "type": dtype,
             "default": default,
-            "help": f"({dtype}, default: {default})" if default is not None else None
+            "help": f"({dtype.__name__}, default: {default})" if default is not None else None
         }
 
         if dtype == bool:
