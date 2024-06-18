@@ -2,8 +2,9 @@ import subprocess
 from pathlib import Path
 from functools import wraps
 import inspect
+from shlex import quote as _quote_cmdline_str
 
-from .util import get_env_var, load_func_argparser
+from .utils import get_env_var, load_func_argparser
 
 __all__ = ["get_slurm_id", "is_this_a_slurm_job", "slurm_job", "slurm_exec", "set_slurm_debug"]
 
@@ -98,7 +99,7 @@ class SlurmExecutableBuilder:
 # The -l flag makes the script run as if it were executed on the login node;
 # this makes it so ~/.bashrc is loaded and the conda env loads properly.
 #
-# This script was created by a slurmexec SlurmExecutableBuilder
+# This script was created by slurmexec
 #
 {args}
 
@@ -281,7 +282,14 @@ def slurm_exec(func, n_parallel_jobs=1, script_dir=None, job_name=None, slurm_ar
         slurm.command(pre_run_commands)
         
         python_file = str(func_file)
-        exec_args_str = " ".join([f"--{a} {v}" for a, v in exec_args.items()])
+        exec_args_str = []
+        for argname, value in exec_args.items():
+            if isinstance(value, str):
+                value = _quote_cmdline_str(value)
+            exec_args_str.append(f"--{argname}={value}")
+        exec_args_str = " ".join(exec_args_str)
+        slurm.command(f"echo Executing via: python {python_file} {exec_args_str}")
+        slurm.command("echo")
         slurm.command(f"python {python_file} {exec_args_str}")
 
         # Finally execute the sbatch

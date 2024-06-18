@@ -1,6 +1,19 @@
 import os
-import argparse
 import inspect
+import argparse
+from argparse import Namespace
+
+def compile_current_function_args(**kwargs):
+    """Compiles the arguments of the current function into a Namespace object."""
+    frame = inspect.currentframe().f_back
+    if frame is None:
+        raise ValueError("No frame found")
+    arg_names, _, _, locals = inspect.getargvalues(frame)
+    # arg_names is the list of argument names of the function
+    # locals is the dictionary of local variables in the function (superset of arg_names, including locally-defined values)
+    args = {arg: locals[arg] for arg in arg_names}
+    args.update(kwargs)
+    return Namespace(**args)
 
 def get_env_var(*varnames):
     """
