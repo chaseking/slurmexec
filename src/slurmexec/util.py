@@ -52,7 +52,7 @@ def load_func_argparser(func, ignore=None):
         kwargs = {
             "type": dtype,
             "default": default,
-            "help": f"({dtype.__name__}, default: {default})" if default is not None else None
+            "help": f"({dtype.__name__}, Default: {default})" if default is not None else None
         }
 
         if dtype == bool:
@@ -61,10 +61,12 @@ def load_func_argparser(func, ignore=None):
             # del kwargs["type"]  # can't have both type and store_true action
 
             kwargs["type"] = _str_to_bool
-            kwargs["nargs"] = "?"  # so just `--flag` is equivalent to `not default`
-            kwargs["const"] = not default
+            kwargs["nargs"] = "?"  # so just `--flag` is equivalent to True if default is False
+            kwargs["const"] = True if default is False else False
             kwargs["default"] = default
-            kwargs["help"] += f" Use `--{name}` to set to {not default}. (Alternatively `--{name} True/False`)"
+            if default is False:
+                kwargs["help"] += f" Use `--{name}` to set to True. (Alternatively `--{name} True/False`)"
+            kwargs["help"] += f" Use `--{name} True/False` to change."
 
         parser.add_argument(f"--{name}", **kwargs)
     
