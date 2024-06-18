@@ -9,9 +9,15 @@ Lightweight Python library to easily deploy and execute Slurm tasks. Fast and ea
 ## Install
 Option 1 (preferred): Directly:
 ```
+# Install
 pip install git+https://github.com/chaseking/slurmexec.git
 ```
-**Note:** If you use this method you will need to run `pip uninstall slurmexec` and reinstall to upgrade this package. Eventually I will make this available on PyPI to make this process easier.
+**Note:** If you use this method you will need to run
+```
+# Upgrade
+pip uninstall -y slurmexec && pip install git+https://github.com/chaseking/slurmexec
+```
+to upgrade this package. Eventually I will make this available on PyPI to make this process easier.
 
 Option 2: Clone and install
 ```
