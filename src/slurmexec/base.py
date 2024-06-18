@@ -44,13 +44,13 @@ class SlurmExecutableBuilder:
         self.full_job_name = full_job_name
 
         if script_dir is None:
-            self._dir = Path.home() / "slurm" / job_name
+            self._dir = Path.home() / "slurm"
         if type(script_dir) is not Path:
             self._dir = Path(script_dir).expanduser()
         else:
             self._dir = script_dir
         
-        self.script_file = self._dir / f"job.slurm"
+        self.script_file = self._dir / job_name / f"job.slurm"
         
         self._args = {
             "--job-name": job_name,
