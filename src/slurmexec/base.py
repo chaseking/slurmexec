@@ -61,9 +61,9 @@ class SlurmExecutableBuilder:
         self.output(f"%x_%j.log") # %x is job name, %A is job id assigned by slurm
 
         if full_job_name is None:
-            self.command(f"echo '# Executing job \"{job_name}\" in a task generated using SlurmExecutableBuilder.'")
+            self.command(f"echo '# Executing job \"{job_name}\" in a task generated using slurmexec.'")
         else:
-            self.command(f"echo '# Executing job \"{job_name}\" ({full_job_name}) in a task generated using SlurmExecutableBuilder.'")
+            self.command(f"echo '# Executing job \"{job_name}\" ({full_job_name}) in a task generated using slurmexec.'")
     
     def arg(self, arg: str, value: any):
         self._args[arg] = value
