@@ -46,12 +46,12 @@ class SlurmExecutableBuilder:
 
         if script_dir is None:
             self._dir = Path.home() / "slurm"
-        if type(script_dir) is not Path:
+        if not isinstance(script_dir, Path):
             self._dir = Path(script_dir).expanduser()
         else:
             self._dir = script_dir
         
-        self.script_file = self._dir / job_name / f"job.slurm"
+        self.script_file = self._dir / job_name / f"_temp_job.slurm"
         
         self._args = {
             "--job-name": job_name,
@@ -166,7 +166,7 @@ def slurm_job(func):
     return wrapper
 
 
-def slurm_exec(func, n_parallel_jobs=1, script_dir=None, job_name=None, slurm_args=None, pre_run_commands=None):
+def slurm_exec(func, n_parallel_jobs=1, script_dir="~/slurm", job_name=None, slurm_args=None, pre_run_commands=None):
     """Runs a slurm job. Used in the main method of a .py file.
     Specifically, if called from within a slurm task, `func` will be called.
     Otherwise, it creates a new slurm task specified by the arguments.
@@ -174,7 +174,7 @@ def slurm_exec(func, n_parallel_jobs=1, script_dir=None, job_name=None, slurm_ar
     Args:
         func (function): Function to call
         n_parallel_jobs (int, optional): Number of parallel jobs. If 2 or more, then will be run as an array. Defaults to 1.
-        script_dir (str, optional): Script directory. Defaults to ~/slurm/job_name, where job_name is the name of func.
+        script_dir (str, optional): Script directory. Defaults to ~/slurm.
         slurm_args (dict, optional): Slurm batch arguments. Defaults to {}.
         pre_run_commands (list, optional): List of commands to run before the main command (e.g., activate environment). None by default.
 
@@ -191,22 +191,17 @@ def slurm_exec(func, n_parallel_jobs=1, script_dir=None, job_name=None, slurm_ar
     
     if job_name is None:
         job_name = func.__name__
-    if script_dir is None:
-        script_dir = f"~/slurm/{job_name}"
-
+    script_dir = script_dir.format(job_name=job_name)
+    
     # First we check if this function was called from a slurm task
     # This is identified by whether a slurm-id argument is passed
     # parser = argparse.ArgumentParser()
     parser = load_func_argparser(func)
-    parser.add_argument("--n_parallel_jobs", type=int, default=n_parallel_jobs, help="If >1 then will be run as a slurm array task.")
-    parser.add_argument("--out_dir", type=str, default=script_dir, help="Directory to save the slurm script.")
     parser.add_argument("--job_name", type=str, default=job_name, help="Name of the slurm job.")
     exec_args, unk_args = parser.parse_known_args()
     exec_args = vars(exec_args)  # convert to dict
 
     # remove keys that shouldn't be passed to the function
-    n_parallel_jobs = exec_args.pop("n_parallel_jobs")
-    script_dir = exec_args.pop("out_dir")
     job_name = exec_args.pop("job_name")
 
     if is_this_a_slurm_job():
@@ -215,7 +210,7 @@ def slurm_exec(func, n_parallel_jobs=1, script_dir=None, job_name=None, slurm_ar
     else:
         # This function was executed by a user, with the intention to start a slurm task
         # Parse function arguments and use these as arguments when executing the task
-        is_array_task = n_parallel_jobs > 1
+        is_array_task = "--array" in unk_args  # if --array is passed, then assume it is an array task
 
         # Load slurm batch arguments
         default_slurm_args = {
@@ -224,9 +219,6 @@ def slurm_exec(func, n_parallel_jobs=1, script_dir=None, job_name=None, slurm_ar
             # "--mem-per-cpu": "1G"
             # "--time": "1-00:00:00",  # default 1 day
         }
-
-        if is_array_task:
-            default_slurm_args["--array"] = f"1-{n_parallel_jobs}"
 
         # slurm_args = {(f"--{k}" if not k.startswith("--") else k): v for k, v in slurm_args.items()}
         slurm_args = default_slurm_args | slurm_args
