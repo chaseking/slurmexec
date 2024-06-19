@@ -281,7 +281,7 @@ def slurm_exec(func, n_parallel_jobs=1, script_dir="~/slurm", job_name=None, slu
                 value = _quote_cmdline_str(value)
             exec_args_str.append(f"--{argname}={value}")
         exec_args_str = " ".join(exec_args_str)
-        slurm.command(f"echo Executing via: srun python {python_file} {exec_args_str}")
+        slurm.command(f"echo # Executing via: srun python {python_file} {exec_args_str}")
         slurm.command("echo")
         slurm.command(f"srun python {python_file} {exec_args_str}")
 
