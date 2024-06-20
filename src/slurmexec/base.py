@@ -242,6 +242,8 @@ def slurm_exec(func, n_parallel_jobs=1, script_dir="~/slurm", job_name=None, slu
             func_filename = func_file.name
             func_filename = func_filename[:func_filename.rindex(".")]
             job_name = f"{func_filename}-{func.__name__}"
+        
+        job_name = job_name.format(args=exec_args)
 
         slurm = SlurmExecutableBuilder(job_name, full_job_name=full_job_name, script_dir=script_dir)
         slurm.args(slurm_args)
