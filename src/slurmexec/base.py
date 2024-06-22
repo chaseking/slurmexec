@@ -198,7 +198,7 @@ def slurm_exec(func, n_parallel_jobs=1, script_dir="~/slurm", job_name=None, slu
     # This is identified by whether a slurm-id argument is passed
     # parser = argparse.ArgumentParser()
     parser = load_func_argparser(func)
-    parser.add_argument("--job_name", type=str, default=job_name, help="Name of the slurm job.")
+    parser.add_argument("--job_name", type=str, default=job_name, help=f"Name of the slurm job. (Default: \"{job_name}\")")
     exec_args, unk_args = parser.parse_known_args()
     exec_args = vars(exec_args)  # convert to dict
 
