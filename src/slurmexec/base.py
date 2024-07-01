@@ -119,7 +119,7 @@ class SlurmExecutableBuilder:
             output = subprocess.check_output(["sbatch", str(self.script_file)], stderr=subprocess.STDOUT)
             output = output.decode().strip() # parse binary; strip newlines
         except subprocess.CalledProcessError as e:
-            output = e.output().decode("utf-8")
+            output = e.output.decode("utf-8")
         except Exception as e:
             raise RuntimeError(f"An unexpected error occurred: {e}")
 
