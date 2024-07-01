@@ -129,7 +129,6 @@ class SlurmExecutableBuilder:
         if self.full_job_name is not None:
             print(f"|      ({self.full_job_name})")
         print("|")
-        output = output.decode().strip() # parse binary; strip newlines
         
         if output.startswith("Submitted batch job"):
             job_id = output.rsplit(" ", maxsplit=1)[-1] # last item
