@@ -116,7 +116,7 @@ class SlurmExecutableBuilder:
         
         # Execute file
         try:
-            output = subprocess.check_output(["sbatch", self.script_file], stderr=subprocess.STDOUT)
+            output = subprocess.check_output(["sbatch", str(self.script_file)], stderr=subprocess.STDOUT)
         except Exception as e:
             raise RuntimeError(f"Failed to execute slurm task: {e}")
 
