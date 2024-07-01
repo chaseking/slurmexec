@@ -117,8 +117,12 @@ class SlurmExecutableBuilder:
         # Execute file
         try:
             output = subprocess.check_output(["sbatch", str(self.script_file)], stderr=subprocess.STDOUT)
+        except subprocess.CalledProcessError as e:
+            error_message = e.output.decode('utf-8')
+            print(f"Failed to execute slurm task. Error message: {error_message}")
+            raise RuntimeError(f"Failed to execute slurm task ({error_message}): {e}")
         except Exception as e:
-            raise RuntimeError(f"Failed to execute slurm task: {e}")
+            raise RuntimeError(f"An unexpected error occurred: {e}")
 
         print()
         print("*===============================================================================*")
