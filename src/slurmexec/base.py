@@ -226,6 +226,7 @@ def slurm_exec(
     exec_args, unk_args = parser.parse_known_args()
     job_name = exec_args.job_name
     delattr(exec_args, "job_name")
+    exec_args_dict = vars(exec_args)
     
     if is_this_a_slurm_job():
         # This was executed from within a slurm job; call function directly
@@ -234,7 +235,7 @@ def slurm_exec(
             func(exec_args)
         else:
             # Otherwise, pass each argument as a keyword argument
-            func(**vars(exec_args))
+            func(**exec_args_dict)
     else:
         # This function was executed by a user, with the intention to start a slurm task
         # Parse function arguments and use these as arguments when executing the task
@@ -270,7 +271,7 @@ def slurm_exec(
             func_filename = func_filename[:func_filename.rindex(".")]
             job_name = f"{func_filename}-{func.__name__}"
         
-        job_name = job_name.format(**exec_args)
+        job_name = job_name.format(**exec_args_dict)
 
         slurm = SlurmExecutableBuilder(job_name, full_job_name=full_job_name, script_dir=script_dir)
         slurm.args(slurm_args)
@@ -305,7 +306,7 @@ def slurm_exec(
         
         python_file = str(func_file)
         exec_args_str = []
-        for argname, value in exec_args.items():
+        for argname, value in exec_args_dict.items():
             if isinstance(value, str):
                 value = _quote_cmdline_str(value)
             exec_args_str.append(f"--{argname}={value}")
