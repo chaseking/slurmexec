@@ -220,7 +220,7 @@ def slurm_exec(
         else:
             raise ValueError("argparser must be an instance of argparse.ArgumentParser or a callable that returns an argparse.ArgumentParser")
     else:
-        parser = load_func_argparser()
+        parser = load_func_argparser(func)
 
     parser.add_argument("--job_name", type=str, default=job_name, help=f"Name of the slurm job. (Default: \"{job_name}\")")
     exec_args, unk_args = parser.parse_known_args()
