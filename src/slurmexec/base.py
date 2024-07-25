@@ -3,6 +3,8 @@ from pathlib import Path
 from functools import wraps
 import inspect
 from shlex import quote as _quote_cmdline_str
+import argparse
+from typing import Optional, List, Dict
 
 from .utils import get_env_var, load_func_argparser
 
@@ -139,7 +141,7 @@ class SlurmExecutableBuilder:
         else:
             print("|   Status: FAIL [!!!]")
             print(f"|   Script file: {self.script_file}")
-            print(f"|   Error: Bad sbatch output:")
+            print(f"|   Error:")
             
             for line in output.split("\n"):
                 print(f"|   {line}")
@@ -168,13 +170,23 @@ def slurm_job(func):
     return wrapper
 
 
-def slurm_exec(func, n_parallel_jobs=1, script_dir="~/slurm", job_name=None, slurm_args=None, pre_run_commands=None, srun=True):
+def slurm_exec(
+        func: callable,
+        argparser: Optional[argparse.ArgumentParser] = None,
+        n_parallel_jobs: int = 1,
+        script_dir: str = "~/slurm",
+        job_name: Optional[str] = None,
+        slurm_args: Optional[Dict[str, any]] = None,
+        pre_run_commands: Optional[List[str]] = None,
+        srun: bool = True
+    ):
     """Runs a slurm job. Used in the main method of a .py file.
     Specifically, if called from within a slurm task, `func` will be called.
     Otherwise, it creates a new slurm task specified by the arguments.
 
     Args:
-        func (function): Function to call
+        func (callable): Function to call
+        argparser (argparse.ArgumentParser, optional): Argument parser for the function. Defaults to parsing the arguments in the `func` declaration.
         n_parallel_jobs (int, optional): Number of parallel jobs. If 2 or more, then will be run as an array. Defaults to 1.
         script_dir (str, optional): Script directory. Defaults to ~/slurm.
         slurm_args (dict, optional): Slurm batch arguments. Defaults to {}.
@@ -198,22 +210,35 @@ def slurm_exec(func, n_parallel_jobs=1, script_dir="~/slurm", job_name=None, slu
     
     # First we check if this function was called from a slurm task
     # This is identified by whether a slurm-id argument is passed
-    # parser = argparse.ArgumentParser()
-    parser = load_func_argparser(func)
+    given_argparser = argparser is not None
+    if given_argparser:
+        if isinstance(argparser, argparse.ArgumentParser):
+            # parser = argparse.ArgumentParser(parents=[argparser])
+            parser = argparser
+        elif callable(argparser):
+            parser = argparser()
+        else:
+            raise ValueError("argparser must be an instance of argparse.ArgumentParser or a callable that returns an argparse.ArgumentParser")
+    else:
+        parser = load_func_argparser()
+
     parser.add_argument("--job_name", type=str, default=job_name, help=f"Name of the slurm job. (Default: \"{job_name}\")")
     exec_args, unk_args = parser.parse_known_args()
-    exec_args = vars(exec_args)  # convert to dict
-
-    # remove keys that shouldn't be passed to the function
-    job_name = exec_args.pop("job_name")
-
+    job_name = exec_args.job_name
+    delattr(exec_args, "job_name")
+    
     if is_this_a_slurm_job():
         # This was executed from within a slurm job; call function directly
-        func(**exec_args)
+        if given_argparser:
+            # If an argparser was given, then the function expects a single argument of the parsed args
+            func(exec_args)
+        else:
+            # Otherwise, pass each argument as a keyword argument
+            func(**vars(exec_args))
     else:
         # This function was executed by a user, with the intention to start a slurm task
         # Parse function arguments and use these as arguments when executing the task
-        is_array_task = "--array" in unk_args  # if --array is passed, then assume it is an array task
+        is_array_task = "--array" in unk_args or "-a" in unk_args  # if --array is passed, then assume it is an array task
 
         # Load slurm batch arguments
         default_slurm_args = {
