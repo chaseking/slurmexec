@@ -306,22 +306,21 @@ def slurm_exec(
         slurm.command(pre_run_commands)
         
         python_file = str(func_file)
-        exec_args_str = []
+        exec_args_slurm = []
         # for argname, value in exec_args_dict.items():
         #     if isinstance(value, str):
         #         value = _quote_cmdline_str(value)
-        #     exec_args_str.append(f"--{argname}={value}")
+        #     exec_args_slurm.append(f"--{argname}={value}")
         # Now we are using the executed args:
         for arg in sys.argv[1:]:  # everything after the script name
             if arg not in unk_args:  # ignore unk_args, which are assumed to be slurm arguments
-                exec_args_str.append(arg)
-        exec_args_str = " ".join(exec_args_str)
-
-        command = "python {python_file}"
+                exec_args_slurm.append(arg)
+        
+        command = ["python", python_file]
+        command.extend(exec_args_slurm)
         if srun:
-            command = "srun " + command
-        if exec_args_str:
-            command += " " + exec_args_str
+            command.insert(0, "srun")
+        command = " ".join(command)
 
         slurm.command(f"echo '# Executing via:' {command}")
         slurm.command("echo")
