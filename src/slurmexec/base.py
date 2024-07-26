@@ -1,8 +1,8 @@
+import sys
 import subprocess
 from pathlib import Path
 from functools import wraps
 import inspect
-from shlex import quote as _quote_cmdline_str
 import argparse
 from typing import Optional, List, Dict
 
@@ -305,15 +305,23 @@ def slurm_exec(
         slurm.command(pre_run_commands)
         
         python_file = str(func_file)
-        exec_args_str = []
-        for argname, value in exec_args_dict.items():
-            if isinstance(value, str):
-                value = _quote_cmdline_str(value)
-            exec_args_str.append(f"--{argname}={value}")
+        # exec_args_str = []
+        # for argname, value in exec_args_dict.items():
+        #     if isinstance(value, str):
+        #         value = _quote_cmdline_str(value)
+        #     exec_args_str.append(f"--{argname}={value}")
+        exec_args_str = sys.argv[1:]
         exec_args_str = " ".join(exec_args_str)
-        slurm.command(f"echo '# Executing via:' srun python {python_file} {exec_args_str}")
+
+        command = "python {python_file}"
+        if srun:
+            command = "srun " + command
+        if exec_args_str:
+            command += " " + exec_args_str
+
+        slurm.command(f"echo '# Executing via:' {command}")
         slurm.command("echo")
-        slurm.command(f"srun python {python_file} {exec_args_str}")
+        slurm.command(command)
 
         # Finally execute the sbatch
         slurm.sbatch()
