@@ -314,7 +314,7 @@ def slurm_exec(
         # Now we are using the executed args:
         for arg in sys.argv[1:]:  # everything after the script name
             if arg not in unk_args:  # ignore unk_args, which are assumed to be slurm arguments
-                exec_args_slurm.append(arg)
+                exec_args_slurm.append(_quote_cmdline_str(arg))
         
         command = ["python", python_file]
         command.extend(exec_args_slurm)
