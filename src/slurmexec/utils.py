@@ -65,8 +65,16 @@ def load_func_argparser(func, ignore=None):
         kwargs = {
             "type": dtype,
             "default": default,
-            "help": f"({dtype.__name__}, Default: {default})" if default is not None else None
         }
+
+        if default is None:
+            # Required argument
+            kwargs["required"] = True
+            
+            # TODO: Might be nice having a way to add required arguments, as in:
+            # https://stackoverflow.com/a/41747010
+        else:
+            kwargs["help"] = f"({dtype.__name__}, Default: {default})" if default is not None else None
 
         if dtype == bool:
             # kwargs["action"] = argparse.BooleanOptionalAction
