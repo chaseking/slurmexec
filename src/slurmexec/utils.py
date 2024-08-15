@@ -70,6 +70,7 @@ def load_func_argparser(func, ignore=None):
         if default is None:
             # Required argument
             kwargs["required"] = True
+            kwargs["help"] = f"(*{dtype.__name__}, required)"
             
             # TODO: Might be nice having a way to add required arguments, as in:
             # https://stackoverflow.com/a/41747010
