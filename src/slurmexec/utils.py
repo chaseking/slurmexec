@@ -67,13 +67,10 @@ def load_func_argparser(func, ignore=None):
             "default": default,
         }
 
-        if default is None:
+        if param.default is inspect._empty:
             # Required argument
             kwargs["required"] = True
             kwargs["help"] = f"(*{dtype.__name__}, required)"
-            
-            # TODO: Might be nice having a way to add required arguments, as in:
-            # https://stackoverflow.com/a/41747010
         else:
             kwargs["help"] = f"({dtype.__name__}, Default: {default})" if default is not None else None
 
