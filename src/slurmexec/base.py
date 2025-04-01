@@ -136,10 +136,11 @@ class SlurmExecutableBuilder:
         if bprint:
             print()
             print("*===============================================================================*")
+        
         bprint(f"Executing Slurm job with name \"{self.job_name}\"...")
         if self.full_job_name is not None:
-            bprint(f"|      ({self.full_job_name})")
-        bprint("|")
+            bprint(f"   ({self.full_job_name})")
+        bprint("")
 
         out_data = {
             "success": True,
@@ -152,18 +153,18 @@ class SlurmExecutableBuilder:
 
             out_data["job_id"] = job_id
             out_data["log_file"] = log_file
-            bprint("|   Status: SUCCESS")
-            bprint(f"|   Slurm job id: {job_id}")
-            bprint(f"|   Script file: {self.script_file}")
-            bprint(f"|   Log file: {log_file}")
+            bprint("Status: SUCCESS")
+            bprint(f"Slurm job id: {job_id}")
+            bprint(f"Script file: {self.script_file}")
+            bprint(f"Log file: {log_file}")
         else:
             out_data["success"] = False
-            bprint("|   Status: FAIL [!!!]")
-            bprint(f"|   Script file: {self.script_file}")
-            bprint(f"|   Error:")
+            bprint("Status: FAIL [!!!]")
+            bprint(f"Script file: {self.script_file}")
+            bprint(f"Error:")
             
             for line in output.split("\n"):
-                bprint(f"|   {line}")
+                bprint(f"{line}")
         
         if bprint:
             print("|")
