@@ -133,7 +133,7 @@ class SlurmExecutableBuilder:
             else:
                 print(*args, **kwargs)
 
-        if bprint:
+        if box_print:
             print()
             print("*===============================================================================*")
         
@@ -166,7 +166,7 @@ class SlurmExecutableBuilder:
             for line in output.split("\n"):
                 bprint(f"{line}")
         
-        if bprint:
+        if box_print:
             print("|")
             print("*===============================================================================*")
             print()
