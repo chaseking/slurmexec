@@ -32,6 +32,7 @@ def set_slurm_debug(debug: bool = True):
         print()
 
 def get_slurm_id():
+    global _IS_SLURM_DEBUG
     if _IS_SLURM_DEBUG:
         return "SLURM_DEBUG"
     else:
