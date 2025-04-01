@@ -91,7 +91,7 @@ class SlurmExecutableBuilder:
             self._commands.extend(command)
         return self
 
-    def sbatch(self):
+    def sbatch(self, box_print=True):
         args = "\n".join([
             f"#SBATCH {arg}={value}" if arg.startswith("--")
             else f"#SBATCH {arg} {value}"
@@ -127,30 +127,50 @@ class SlurmExecutableBuilder:
         except Exception as e:
             raise RuntimeError(f"An unexpected error occurred: {e}")
 
-        print()
-        print("*===============================================================================*")
-        print(f"|   Executing Slurm job with name \"{self.job_name}\"...")
+        def bprint(*args, **kwargs):
+            if box_print:
+                print("|  ", *args, **kwargs)
+            else:
+                print(*args, **kwargs)
+
+        if bprint:
+            print()
+            print("*===============================================================================*")
+        bprint(f"Executing Slurm job with name \"{self.job_name}\"...")
         if self.full_job_name is not None:
-            print(f"|      ({self.full_job_name})")
-        print("|")
+            bprint(f"|      ({self.full_job_name})")
+        bprint("|")
+
+        out_data = {
+            "success": True,
+            "script_file": str(self.script_file),
+        }
         
         if output.startswith("Submitted batch job"):
             job_id = output.rsplit(" ", maxsplit=1)[-1] # last item
-            print("|   Status: SUCCESS")
-            print(f"|   Slurm job id: {job_id}")
-            print(f"|   Script file: {self.script_file}")
-            print(f"|   Log file: {self._args['--output'].replace('%x', self.job_name).replace('%A', job_id).replace('%j', job_id)}")
+            log_file = self._args["--output"].replace("%x", self.job_name).replace("%A", job_id).replace("%j", job_id)
+
+            out_data["job_id"] = job_id
+            out_data["log_file"] = log_file
+            bprint("|   Status: SUCCESS")
+            bprint(f"|   Slurm job id: {job_id}")
+            bprint(f"|   Script file: {self.script_file}")
+            bprint(f"|   Log file: {log_file}")
         else:
-            print("|   Status: FAIL [!!!]")
-            print(f"|   Script file: {self.script_file}")
-            print(f"|   Error:")
+            out_data["success"] = False
+            bprint("|   Status: FAIL [!!!]")
+            bprint(f"|   Script file: {self.script_file}")
+            bprint(f"|   Error:")
             
             for line in output.split("\n"):
-                print(f"|   {line}")
+                bprint(f"|   {line}")
         
-        print("|")
-        print("*===============================================================================*")
-        print()
+        if bprint:
+            print("|")
+            print("*===============================================================================*")
+            print()
+
+        return out_data
         
 
 def slurm_job(func):
@@ -180,7 +200,8 @@ def slurm_exec(
         job_name: Optional[str] = None,
         slurm_args: Optional[Dict[str, any]] = None,
         pre_run_commands: Optional[List[str]] = None,
-        srun: bool = True
+        srun: bool = True,
+        **kwargs
     ):
     """Runs a slurm job. Used in the main method of a .py file.
     Specifically, if called from within a slurm task, `func` will be called.
@@ -328,4 +349,5 @@ def slurm_exec(
         slurm.command(command)
 
         # Finally execute the sbatch
-        slurm.sbatch()
+        return slurm.sbatch(**kwargs)
+    

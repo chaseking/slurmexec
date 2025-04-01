@@ -1,6 +1,6 @@
 [project]
 name = "slurmexec"
-version = "1.0.2"
+version = "1.0.3"
 description = "Slurm python executor."
 readme = "README.md"
 license = {file = "LICENSE"}
