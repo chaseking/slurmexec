@@ -300,8 +300,8 @@ def slurm_exec(
         job_name = job_name.format(**exec_args_dict)
 
         slurm = SlurmExecutableBuilder(job_name, full_job_name=full_job_name, script_dir=script_dir)
-        is_array_task = slurm.is_array_task()
         slurm.args(slurm_args)
+        is_array_task = slurm.is_array_task()
 
         # Set output file name as "{job id}_{array task id}"
         # %A is the slurm array parent job id
