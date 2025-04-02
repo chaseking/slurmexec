@@ -146,6 +146,8 @@ class SlurmExecutableBuilder:
             "success": True,
             "script_file": str(self.script_file),
         }
+
+        bprint(f"Slurm output: {output}")
         
         if output.startswith("Submitted batch job"):
             job_id = output.rsplit(" ", maxsplit=1)[-1] # last item
@@ -196,7 +198,6 @@ def slurm_job(func):
 def slurm_exec(
         func: callable,
         argparser: Optional[argparse.ArgumentParser] = None,
-        # n_parallel_jobs: int = 1,
         script_dir: str = "~/slurm",
         job_name: Optional[str] = None,
         slurm_args: Optional[Dict[str, any]] = None,
@@ -211,7 +212,6 @@ def slurm_exec(
     Args:
         func (callable): Function to call
         argparser (argparse.ArgumentParser, optional): Argument parser for the function. Defaults to parsing the arguments in the `func` declaration.
-        # n_parallel_jobs (int, optional): Number of parallel jobs. If 2 or more, then will be run as an array. Defaults to 1.
         script_dir (str, optional): Script directory. Defaults to ~/slurm.
         slurm_args (dict, optional): Slurm batch arguments. Defaults to {}.
         pre_run_commands (list, optional): List of commands to run before the main command (e.g., activate environment). None by default.
