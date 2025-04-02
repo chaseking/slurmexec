@@ -196,7 +196,7 @@ def slurm_job(func):
 def slurm_exec(
         func: callable,
         argparser: Optional[argparse.ArgumentParser] = None,
-        n_parallel_jobs: int = 1,
+        # n_parallel_jobs: int = 1,
         script_dir: str = "~/slurm",
         job_name: Optional[str] = None,
         slurm_args: Optional[Dict[str, any]] = None,
@@ -211,7 +211,7 @@ def slurm_exec(
     Args:
         func (callable): Function to call
         argparser (argparse.ArgumentParser, optional): Argument parser for the function. Defaults to parsing the arguments in the `func` declaration.
-        n_parallel_jobs (int, optional): Number of parallel jobs. If 2 or more, then will be run as an array. Defaults to 1.
+        # n_parallel_jobs (int, optional): Number of parallel jobs. If 2 or more, then will be run as an array. Defaults to 1.
         script_dir (str, optional): Script directory. Defaults to ~/slurm.
         slurm_args (dict, optional): Slurm batch arguments. Defaults to {}.
         pre_run_commands (list, optional): List of commands to run before the main command (e.g., activate environment). None by default.
@@ -263,8 +263,6 @@ def slurm_exec(
     else:
         # This function was executed by a user, with the intention to start a slurm task
         # Parse function arguments and use these as arguments when executing the task
-        is_array_task = "--array" in unk_args or "-a" in unk_args  # if --array is passed, then assume it is an array task
-
         # Load slurm batch arguments
         default_slurm_args = {
             # "--ntasks": 1,
@@ -278,6 +276,7 @@ def slurm_exec(
 
         # Pass any unknown command line arguments to slurm_args
         if unk_args:
+            # Note these must be formatted as "--key1 value1 --key2 value2..."
             slurm_unk_args = {
                 unk_args[i]: unk_args[i+1]
                 for i in range(0, len(unk_args), 2)
@@ -285,6 +284,7 @@ def slurm_exec(
             print(f"Passing `{' '.join(unk_args)}` as arguments to SBATCH.")
             slurm_args = slurm_args | slurm_unk_args
 
+        is_array_task = "--array" in slurm_args or "-a" in slurm_args  # if --array is passed, then assume it is an array task
 
         # Load job name: "{filename}-{func_name}"
         func_file = Path(inspect.getfile(func.__wrapped__))  # the file of the function (wrapped used because otherwise it would return the decorator file)
