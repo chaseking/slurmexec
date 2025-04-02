@@ -79,6 +79,7 @@ def load_func_argparser(func, ignore=None):
             # Correct way to check if a type is a Literal
             # https://docs.python.org/3.9/library/typing.html#typing.get_origin
             kwargs["choices"] = list(dtype.__args__)
+            del kwargs["type"]  # can't have both type and choices
 
         if dtype == bool:
             # kwargs["action"] = argparse.BooleanOptionalAction
