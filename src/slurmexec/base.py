@@ -84,6 +84,9 @@ class SlurmExecutableBuilder:
         self.arg("--error", out)
         return self
 
+    def is_array_task(self):
+        return "--array" in self._args or "-a" in self._args
+
     def command(self, command: str | list[str]):
         if isinstance(command, str):
             self._commands.append(command)
@@ -145,6 +148,7 @@ class SlurmExecutableBuilder:
         out_data = {
             "success": True,
             "script_file": str(self.script_file),
+            "is_array_task": self.is_array_task(),
         }
 
         bprint(f"Slurm output: {output}")
@@ -284,8 +288,6 @@ def slurm_exec(
             print(f"Passing `{' '.join(unk_args)}` as arguments to SBATCH.")
             slurm_args = slurm_args | slurm_unk_args
 
-        is_array_task = "--array" in slurm_args or "-a" in slurm_args  # if --array is passed, then assume it is an array task
-
         # Load job name: "{filename}-{func_name}"
         func_file = Path(inspect.getfile(func.__wrapped__))  # the file of the function (wrapped used because otherwise it would return the decorator file)
         full_job_name = f"{func.__name__}() in {func_file}"
@@ -298,6 +300,7 @@ def slurm_exec(
         job_name = job_name.format(**exec_args_dict)
 
         slurm = SlurmExecutableBuilder(job_name, full_job_name=full_job_name, script_dir=script_dir)
+        is_array_task = slurm.is_array_task()
         slurm.args(slurm_args)
 
         # Set output file name as "{job id}_{array task id}"

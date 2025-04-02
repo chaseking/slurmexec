@@ -1,6 +1,7 @@
 import os
 import inspect
 import argparse
+import typing
 from argparse import Namespace
 
 def compile_current_function_args(**kwargs):
@@ -73,6 +74,9 @@ def load_func_argparser(func, ignore=None):
             kwargs["help"] = f"(*{dtype.__name__}, required)"
         else:
             kwargs["help"] = f"({dtype.__name__}, Default: {default})" if default is not None else None
+
+        if isinstance(dtype, typing.Literal):
+            kwargs["choices"] = list(dtype.__args__)
 
         if dtype == bool:
             # kwargs["action"] = argparse.BooleanOptionalAction
