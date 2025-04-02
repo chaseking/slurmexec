@@ -75,7 +75,9 @@ def load_func_argparser(func, ignore=None):
         else:
             kwargs["help"] = f"({dtype.__name__}, Default: {default})" if default is not None else None
 
-        if isinstance(dtype, typing.Literal):
+        if typing.get_origin(dtype) == typing.Literal:
+            # Correct way to check if a type is a Literal
+            # https://docs.python.org/3.9/library/typing.html#typing.get_origin
             kwargs["choices"] = list(dtype.__args__)
 
         if dtype == bool:
